@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/discovery",
+      "dest": "/api/index.ts"
+    },
+    {
+      "src": "/greeting",
+      "dest": "/api/index.ts"
+    },
+    {
+      "src": "/todays-date",
+      "dest": "/api/index.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.ts"
+    }
+  ]
+}
