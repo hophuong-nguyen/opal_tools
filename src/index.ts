@@ -8,7 +8,7 @@ app.use(express.json());
 // Create Tools Service
 const toolsService = new ToolsService(app);
 
-// Interfaces for tool parameters
+// ── Interfaces ──────────────────────────────────────────────
 interface GreetingParameters {
   name: string;
   language?: string;
@@ -18,68 +18,57 @@ interface DateParameters {
   format?: string;
 }
 
-/**
- * Greeting Tool: Greets a person in a random language
- */
-// Apply tool decorator after function definition
+// ── Greeting Tool ───────────────────────────────────────────
 async function greeting(parameters: GreetingParameters) {
   const { name, language } = parameters;
-  
-  // If language not specified, choose randomly
-  const selectedLanguage = language || 
+
+  const selectedLanguage =
+    language ||
     ['english', 'spanish', 'french'][Math.floor(Math.random() * 3)];
-  
-  // Generate greeting based on language
-  let greeting: string;
+
+  let greetingText: string;
   if (selectedLanguage.toLowerCase() === 'spanish') {
-    greeting = `¡Hola, ${name}! ¿Cómo estás?`;
+    greetingText = `¡Hola, ${name}! ¿Cómo estás?`;
   } else if (selectedLanguage.toLowerCase() === 'french') {
-    greeting = `Bonjour, ${name}! Comment ça va?`;
-  } else { // Default to English
-    greeting = `Hello, ${name}! How are you?`;
+    greetingText = `Bonjour, ${name}! Comment ça va?`;
+  } else {
+    greetingText = `Hello, ${name}! How are you?`;
   }
-  
+
   return {
-    greeting,
-    language: selectedLanguage
+    greeting: greetingText,
+    language: selectedLanguage,
   };
 }
 
-/**
- * Today's Date Tool: Returns today's date in the specified format
- */
-// Apply tool decorator after function definition
+// ── Today's Date Tool ───────────────────────────────────────
 async function todaysDate(parameters: DateParameters) {
   const format = parameters.format || '%Y-%m-%d';
-  
-  // Get today's date
   const today = new Date();
-  
-  // Format the date (simplified implementation)
+
   let formattedDate: string;
   if (format === '%Y-%m-%d') {
     formattedDate = today.toISOString().split('T')[0];
   } else if (format === '%B %d, %Y') {
-    formattedDate = today.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    formattedDate = today.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   } else if (format === '%d/%m/%Y') {
     formattedDate = today.toLocaleDateString('en-GB');
   } else {
-    // Default to ISO format
     formattedDate = today.toISOString().split('T')[0];
   }
-  
+
   return {
     date: formattedDate,
-    format: format,
-    timestamp: today.getTime() / 1000
+    format,
+    timestamp: today.getTime() / 1000,
   };
 }
 
-// Register the tools using decorators with explicit parameter definitions
+// ── Register Tools ──────────────────────────────────────────
 tool({
   name: 'greeting',
   description: 'Greets a person in a random language (English, Spanish, or French)',
@@ -88,31 +77,31 @@ tool({
       name: 'name',
       type: ParameterType.String,
       description: 'Name of the person to greet',
-      required: true
+      required: true,
     },
     {
       name: 'language',
       type: ParameterType.String,
       description: 'Language for greeting (defaults to random)',
-      required: false
-    }
-  ]
+      required: false,
+    },
+  ],
 })(greeting);
 
 tool({
   name: 'todays-date',
-  description: 'Returns today\'s date in the specified format',
+  description: "Returns today's date in the specified format",
   parameters: [
     {
       name: 'format',
       type: ParameterType.String,
       description: 'Date format (defaults to ISO format)',
-      required: false
-    }
-  ]
+      required: false,
+    },
+  ],
 })(todaysDate);
 
-// Start the server
+// ── Start Server ────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
